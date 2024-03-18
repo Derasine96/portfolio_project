@@ -2,13 +2,12 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from models.tag import Tag, TagBase
-from models.diary import DiaryEntry, DiaryBase
-from .database import get_db
+from database import get_db
 
 router = APIRouter()
 
 
-@router.post("/tags", response_model=Tag)
+@router.post("/tags", response_model=TagBase)
 async def create_tag(tag_base: TagBase, db: Session = Depends(get_db)):
     """Create a new tag"""
     existing_tag = db.query(Tag).filter_by(name=tag_base.name).first()
@@ -22,8 +21,8 @@ async def create_tag(tag_base: TagBase, db: Session = Depends(get_db)):
     return new_tag
 
 
-@router.get("/tags/{tag_name}", response_model=Tag)
-def read_tag(tag_name: TagBase, db: Session = Depends(get_db)):
+@router.get("/tags/{tag_name}", response_model=TagBase)
+def read_tag(tag_name: str, db: Session = Depends(get_db)):
     """Get a specific tag by name."""
     tag = db.query(Tag).filter_by(name=tag_name).first()
     if tag is None:
@@ -33,7 +32,7 @@ def read_tag(tag_name: TagBase, db: Session = Depends(get_db)):
 
 
 @router.delete("/tags/{tag_name}")
-def delete_tag(tag_name: TagBase, db: Session = Depends(get_db)):
+def delete_tag(tag_name: str, db: Session = Depends(get_db)):
     """Delete a tag by name."""
     tag = db.query(Tag).filter_by(name=tag_name).first()
     if tag is None:
@@ -43,7 +42,7 @@ def delete_tag(tag_name: TagBase, db: Session = Depends(get_db)):
     db.commit()
 
 
-@router.put("/tags/{tag_name}", response_model=Tag)
+@router.put("/tags/{tag_name}", response_model=TagBase)
 def update_tag(tag_name: str, tag: TagBase, db: Session = Depends(get_db)):
     """Update a Tag with a diary entry"""
     existing_tag = db.query(Tag).filter_by(name=tag_name).first()

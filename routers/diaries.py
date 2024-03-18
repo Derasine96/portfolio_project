@@ -11,15 +11,8 @@ router = APIRouter(prefix="/diaries", tags=["Diaries"])
 @router.post("/diary", response_model=DiaryBase)
 async def create_diary(diary: DiaryBase, db: Session = Depends(get_db)):
     """Create new diary item"""
-    tag_id = diary.tag_id if diary.tag_id else None
-    if not isinstance(diary.entry, str):
-        raise ValueError("The 'entry' field must be a string.")
-    elif not isinstance(diary.title, str):
-        raise ValueError("The 'title' field must be a string.")
-    elif not diary.date:
-        raise ValueError("A date must be provided for the entry")
     new_diary = DiaryEntry(
-        title=diary.title, content=diary.content, date=diary.date, tag_id=tag_id)
+        title=diary.title, content=diary.content, date=diary.date, tag_id=diary.tag_id)
     try:
         db.add(new_diary)
         db.commit()
@@ -32,7 +25,7 @@ async def create_diary(diary: DiaryBase, db: Session = Depends(get_db)):
 
 
 @router.get("/diary/{diary_name}", response_model=DiaryBase)
-def read_diary(diary_name: DiaryBase, db: Session = Depends(get_db)):
+def read_diary(diary_name: str, db: Session = Depends(get_db)):
     """Get an existing diary by title."""
     diary = db.query(DiaryEntry).filter(DiaryEntry.title == diary_name).first()
     if not diary:
@@ -42,8 +35,8 @@ def read_diary(diary_name: DiaryBase, db: Session = Depends(get_db)):
 
 
 @router.put("/diary/{diary_name}", response_model=DiaryBase)
-async def update_diary(diary_name: DiaryBase, diary_update: DiaryBase,
-                       tag_name: TagBase, db: Session = Depends(get_db)):
+async def update_diary(diary_name: str, diary_update: DiaryBase,
+                       tag_name: str, db: Session = Depends(get_db)):
     """Update an existing diary by title."""
     existing_diary = db.query(DiaryEntry).filter_by(title=diary_name).first()
     if not existing_diary:
@@ -63,7 +56,7 @@ async def update_diary(diary_name: DiaryBase, diary_update: DiaryBase,
 
 
 @router.delete("/diary/{diary_name}", response_model=DiaryBase)
-async def delete_diary(diary_name: DiaryBase, db: Session = Depends(get_db)):
+async def delete_diary(diary_name: str, db: Session = Depends(get_db)):
     """Delete a diary entry by title"""
     existing_diary = db.query(DiaryEntry).filter_by(title=diary_name).first()
     if not existing_diary:
