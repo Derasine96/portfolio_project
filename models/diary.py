@@ -22,9 +22,7 @@ class DiaryBase(BaseModel):
     """Validator for request from database"""
     title: str
     entry: str
-    authorId: int
-    createdAt: str
-    tag_id: Optional[int] = None
+    tag_name: Optional[str] = None
 
 
 class ReadDiary(BaseModel):

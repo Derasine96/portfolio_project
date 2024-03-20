@@ -3,6 +3,9 @@ from sqlalchemy import Column, Integer, String, Date
 from database import Base
 from pydantic import BaseModel
 from passlib.context import CryptContext
+import bcrypt
+from datetime import datetime
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -13,7 +16,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(45), unique=True, nullable=False)
     email = Column(String(255), unique=True, nullable=False)
-    password1 = Column(String(60), nullable=False)
+    password = Column(String(60), nullable=False)
     firstName = Column(String(100), nullable=False)
     lastName = Column(String(100))
     date_of_birth = Column(Date, nullable=False)
@@ -42,6 +45,33 @@ class User(Base):
         """Verify the provided password against the hashed password."""
         return pwd_context.verify(plain_password, hashed_password)
 
+    @staticmethod
+    def hash_password(plain_password: str) -> str:
+        """Hash the provided password."""
+        hashed_password = bcrypt.hashpw(
+            plain_password.encode('utf-8'), bcrypt.gensalt())
+        return hashed_password.decode('utf-8')
+
+    @staticmethod
+    def is_valid_date_of_birth(date_str: str) -> bool:
+        """Check if the provided date of birth is valid."""
+        try:
+            datetime.strptime(date_str, '%Y-%m-%d')
+            return True
+        except ValueError:
+            return False
+
+    def to_dict(self):
+        """Function to return a dictionary representation of an object."""
+        return {
+            "id":  self.id,
+            "username": self.username,
+            "email": self.email,
+            "firstName": self.firstName,
+            "lastName": self.lastName,
+            "date_of_birth": self.date_of_birth
+        }
+
 
 class UserBase(BaseModel):
     """Validator for request from database"""
@@ -53,6 +83,7 @@ class UserBase(BaseModel):
 class UserLogin(BaseModel):
     """Validator for user login request"""
     username: str
+    email: str
     password: str
 
 
@@ -73,4 +104,11 @@ class UserResponse(BaseModel):
     email: str
     firstName: str
     lastName: str
-    date_of_birth: str
+    date_of_birth: datetime
+
+
+class UserCreate(BaseModel):
+    """Validator for signup"""
+    username: str
+    password: str
+    email: str
