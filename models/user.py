@@ -20,6 +20,8 @@ class User(Base):
     firstName = Column(String(100), nullable=False)
     lastName = Column(String(100))
     date_of_birth = Column(Date, nullable=False)
+    theme_color = Column(String)
+    
 
     @staticmethod
     def is_valid_email(email: str) -> bool:

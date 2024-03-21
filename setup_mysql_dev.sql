@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(60) NOT NULL,
     firstName VARCHAR(100) NOT NULL,
     lastName VARCHAR(100),
-    date_of_birth DATE NOT NULL
+    date_of_birth DATE NOT NULL,
+    theme_color VARCHAR(7) DEFAULT '#3a8bf9'
 );
 
 -- Create quotes table
