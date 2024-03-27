@@ -38,3 +38,4 @@ class ReadDiary(BaseModel):
     title: Optional[str]
     createdAt: str
     entry: str
+    
