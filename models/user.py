@@ -1,7 +1,7 @@
 import re
 from sqlalchemy import Column, Integer, String, Date
 from database import Base
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 import bcrypt
 from datetime import datetime
@@ -21,7 +21,6 @@ class User(Base):
     lastName = Column(String(100))
     date_of_birth = Column(Date, nullable=False)
     theme_color = Column(String)
-    
 
     @staticmethod
     def is_valid_email(email: str) -> bool:
@@ -43,16 +42,16 @@ class User(Base):
         return True
 
     @staticmethod
-    def verify_password(plain_password: str, hashed_password: str) -> bool:
-        """Verify the provided password against the hashed password."""
-        return pwd_context.verify(plain_password, hashed_password)
-
-    @staticmethod
     def hash_password(plain_password: str) -> str:
         """Hash the provided password."""
         hashed_password = bcrypt.hashpw(
             plain_password.encode('utf-8'), bcrypt.gensalt())
         return hashed_password.decode('utf-8')
+
+    @staticmethod
+    def verify_password(plain_password: str, hashed_password: str) -> bool:
+        """Verify the provided password against the hashed password."""
+        return pwd_context.verify(plain_password, hashed_password)
 
     @staticmethod
     def is_valid_date_of_birth(date_str: str) -> bool:
@@ -84,7 +83,6 @@ class UserBase(BaseModel):
 
 class UserLogin(BaseModel):
     """Validator for user login request"""
-    username: str
     email: str
     password: str
 
@@ -96,7 +94,7 @@ class UserSignup(BaseModel):
     email: str
     firstName: str
     lastName: str
-    date_of_birth: str
+    date_of_birth: datetime
 
 
 class UserResponse(BaseModel):

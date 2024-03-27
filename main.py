@@ -18,6 +18,14 @@ app.include_router(auth.router, prefix="/auth")
 app.include_router(quotes.router, prefix="/quotes")
 app.include_router(themes.router, prefix="/theme-options")
 
+@app.get("/")
+def index():
+    return {"status": "uvicorn server is working"}
+
+
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", host="127.0.0.1", reload=True, port=8000)
+
 # @app.on_event("startup")
 # async def startup():
 #     await database.connect()

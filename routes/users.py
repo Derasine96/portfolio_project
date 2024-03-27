@@ -27,14 +27,13 @@ def update_user_username(username: str, new_info: UserBase, db: Session = Depend
                for existing_user in db.query(User).all()):
             raise HTTPException(
                 status_code=400, detail="Email already registered")
-    user.copy_from(new_info)
     db.commit()
     return user
 
 
-@router.delete("/users/me/", status_code=204)
+@router.delete("/users/me/", response_model=dict)
 async def delete_user(user: User = Depends(get_user), db: Session = Depends(get_db)):
     """Delete the currently authenticated user account"""
     db.delete(user)
     db.commit()
-    return "User Successfully deleted"
+    return {"message": "User successfully deleted"}

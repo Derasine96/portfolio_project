@@ -5,29 +5,47 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
+
 class ThemeOption(BaseModel):
     """Model for getting user interface theme"""
     name: str
     color: str
 
+
 def fetch_theme_options():
-    """Function to request themes for user interface from an external API"""
-    theme_api_url = "https://source.unsplash.com/300x200/?nature"
+    """Function to fetch theme options"""
+    access_key = 'irA9Q-uhVFnAd1Upu_WNpLaUUiWYVpxBkBic2VUBfwE'
+    collection_id = '206'
+    per_page = 10
+    page = 1
+
+    url = f'https://api.unsplash.com/collections/{collection_id}/photos'
+    headers = {'Authorization': f'Client-ID {access_key}'}
+    params = {'per_page': per_page, 'page': page}
+
     try:
-        response = requests.get(theme_api_url)
+        response = requests.get(url, headers=headers, params=params)
         if response.status_code == 200:
-            theme_options = response.json()
-            return [ThemeOption(name=option['name'], color=option['color'])
-                    for option in theme_options]
+            photos = response.json()
+            return photos
         else:
-            print(f"Failed to fetch theme options: {response.status_code}")
+            print(
+                f"Failed to fetch theme options from API: {response.status_code}")
             return []
     except Exception as e:
         print(f"Failed to fetch theme options from API: {str(e)}")
         return []
 
-@router.get("/theme-options", response_model=List[ThemeOption])
-async def get_theme_options():
-    """FastAPI endpoint to fetch theme options"""
-    return fetch_theme_options()
+
+@router.get("/themes", response_model=List[ThemeOption])
+async def read_themes():
+    """Returns a list of available themes."""
+    data = fetch_theme_options()
+    items = []
+    for item in data:
+        if 'name' in item:
+            items.append(ThemeOption(**item))
+        else:
+            pass
+    return items
 

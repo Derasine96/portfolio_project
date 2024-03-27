@@ -5,7 +5,7 @@ from database import Base
 
 diary_tags = Table('diary_tags', Base.metadata,
                    Column('diary_id', Integer, ForeignKey('diary_entries.id')),
-                   Column('tag_id', Integer, ForeignKey('tags.id'))
+                   Column('tag_id', Integer, ForeignKey('tags.id')), extend_existing=True
                    )
 
 

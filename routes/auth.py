@@ -6,8 +6,7 @@ from sqlalchemy.orm import Session
 from jose import jwt
 from models.user import User, UserLogin, UserSignup
 from database import get_db
-from sqlalchemy.exc import SQLAlchemyError
-from utils.pass_hash import hash_password, verify_password
+from utils.pass_hash import verify_password
 
 
 router = APIRouter()
